@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f5fb" />
+    <meta
+      name="description"
+      content="A simple Elicate Pay STK push testing page."
+    />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%23426bd6'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='22' font-weight='700' fill='white'%3EE%3C/text%3E%3C/svg%3E" />
+    <title>Elicate Pay · STK test</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172033;
+        background: #f5f5fb;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --blue: #426bd6;
+        --blue-dark: #3154b5;
+        --ink: #172033;
+        --muted: #68738a;
+        --line: #e6e9f2;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 8% 12%, rgba(255, 201, 114, .23), transparent 29rem),
+          radial-gradient(ellipse at 95% 0%, rgba(125, 150, 255, .19), transparent 32rem),
+          #f5f5fb;
+      }
+
+      button, input, select { font: inherit; }
+      .page { width: min(100% - 32px, 520px); margin: 0 auto; padding: 28px 0 36px; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-size: 16px; font-weight: 750; letter-spacing: -.04em; text-decoration: none; }
+      .brand-mark { position: relative; display: grid; width: 30px; height: 30px; place-items: center; overflow: hidden; border-radius: 10px; color: #fff; background: linear-gradient(145deg, #6288f0, #395fc6); font-size: 11px; font-weight: 800; box-shadow: 0 5px 12px #426bd633; }
+      .brand-mark::after { position: absolute; right: -4px; bottom: -7px; width: 17px; height: 17px; border-radius: 50%; background: #ffc65d; content: ""; }
+      .brand-pay { color: var(--blue); }
+      .top-label { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid #e3e5ee; border-radius: 999px; background: #ffffffb8; color: #606c84; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+      .top-label::before { width: 7px; height: 7px; border-radius: 50%; background: #f5ac38; content: ""; }
+
+      .hero { position: relative; margin-bottom: 18px; padding: 24px 24px 25px; overflow: hidden; border-radius: 23px; color: #fff; background: linear-gradient(120deg, #375bc1 0%, #5d70d8 58%, #8067dc 100%); box-shadow: 0 15px 32px #4a61bd2c; }
+      .hero::before, .hero::after { position: absolute; border-radius: 50%; content: ""; pointer-events: none; }
+      .hero::before { top: -65px; right: -26px; width: 190px; height: 190px; border: 1px solid #ffffff26; box-shadow: 0 0 0 21px #ffffff0d, 0 0 0 43px #ffffff0a; }
+      .hero::after { right: 94px; bottom: -79px; width: 130px; height: 130px; background: #ffc65d30; }
+      .eyebrow { position: relative; z-index: 1; margin: 0 0 11px; color: #dce5ff; font-size: 11px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { position: relative; z-index: 1; max-width: 360px; margin: 0; font-size: clamp(27px, 7vw, 34px); line-height: 1.1; letter-spacing: -.055em; }
+      .hero-copy { position: relative; z-index: 1; max-width: 380px; margin: 10px 0 0; color: #e5eaff; font-size: 14px; line-height: 1.55; }
+      .spark { position: absolute; top: 21px; right: 24px; z-index: 1; display: grid; width: 35px; height: 35px; place-items: center; border-radius: 12px; background: #ffffff22; color: #ffe194; font-size: 19px; }
+
+      .card { padding: 23px; border: 1px solid #e7e9f1; border-radius: 22px; background: #fff; box-shadow: 0 12px 35px #202b5010; }
+      .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 19px; }
+      .card-heading h2 { margin: 0; font-size: 16px; letter-spacing: -.025em; }
+      .currency { padding: 6px 9px; border-radius: 8px; background: #fff3d8; color: #82560c; font-size: 11px; font-weight: 750; }
+      .field { display: block; margin-bottom: 15px; }
+      .field-label { display: block; margin-bottom: 7px; color: #4c5870; font-size: 12px; font-weight: 700; }
+      .input-wrap { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; background: #fff; transition: border-color .18s, box-shadow .18s; }
+      .input-wrap:focus-within { border-color: #7994e5; box-shadow: 0 0 0 3px #5578dc1c; }
+      .input-prefix { padding-left: 13px; color: #586a92; font-size: 14px; font-weight: 750; }
+      input, select { width: 100%; min-height: 47px; padding: 0 13px; border: 0; outline: 0; border-radius: 12px; background: transparent; color: var(--ink); font-size: 14px; }
+      input::placeholder { color: #a0a8b7; }
+      select { cursor: pointer; }
+      .network-detected { display: flex; min-height: 47px; align-items: center; justify-content: space-between; gap: 10px; padding: 0 13px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+      .network-name { color: var(--ink); font-size: 13px; font-weight: 750; }
+      .network-badge { padding: 6px 9px; border-radius: 999px; background: #edf0f6; color: #69748a; font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+      .network-badge[data-network="MTN"] { background: #fff1c9; color: #795200; }
+      .network-badge[data-network="AIRTEL"] { background: #ffe6e9; color: #b3213a; }
+      .network-badge[data-network="ZAMTEL"] { background: #e1f5e9; color: #207748; }
+      .network-badge[data-network="unknown"] { background: #fff0e5; color: #a45a1b; }
+      .helper { margin: 7px 0 0; color: #8992a4; font-size: 11px; line-height: 1.45; }
+      .submit { display: flex; width: 100%; min-height: 49px; align-items: center; justify-content: center; gap: 9px; margin-top: 19px; border: 0; border-radius: 12px; background: linear-gradient(105deg, #426bd6, #655bd0); color: white; font-size: 14px; font-weight: 750; cursor: pointer; box-shadow: 0 8px 17px #4b65ca30; transition: transform .18s, filter .18s, box-shadow .18s; }
+      .submit:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 11px 20px #4b65ca3b; }
+      .submit:active:not(:disabled) { transform: translateY(0); }
+      .submit:disabled { cursor: wait; opacity: .72; }
+      .button-arrow { font-size: 17px; line-height: 1; }
+
+      .note { display: flex; gap: 10px; margin-top: 16px; padding: 12px; border: 1px solid #ececf3; border-radius: 12px; background: #f8f9fc; color: #6e788e; font-size: 11px; line-height: 1.5; }
+      .note-mark { flex: 0 0 20px; display: grid; width: 20px; height: 20px; place-items: center; border-radius: 7px; background: #e5ecff; color: #4666c1; font-size: 12px; font-weight: 800; }
+
+      .result { margin-top: 16px; padding: 17px; border: 1px solid var(--line); border-radius: 16px; background: #fbfcff; animation: appear .24s ease both; }
+      .result[hidden] { display: none; }
+      .result-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+      .result-title { margin: 0; font-size: 14px; font-weight: 750; }
+      .result-message { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+      .status { flex: 0 0 auto; padding: 6px 9px; border-radius: 999px; background: #fff2d5; color: #986306; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+      .status.success, .status.test-success { background: #e4f7ed; color: #19814c; }
+      .status.failed { background: #ffe8e8; color: #bd3b3b; }
+      .receipt { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0 0; padding-top: 14px; border-top: 1px dashed #dfe3ed; }
+      .receipt div { min-width: 0; }
+      .receipt dt { margin-bottom: 4px; color: #929bad; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+      .receipt dd { overflow-wrap: anywhere; margin: 0; color: #354159; font-size: 12px; font-weight: 700; }
+      .receipt-link { display: inline-block; margin-top: 14px; color: #3d62c8; font-size: 12px; font-weight: 750; text-decoration: none; }
+      .receipt-link:hover { text-decoration: underline; }
+      .error { margin: 12px 0 0; color: #b34242; font-size: 12px; line-height: 1.5; }
+      .error[hidden], .receipt-link[hidden] { display: none; }
+      .foot { margin: 16px 0 0; color: #99a0ae; font-size: 10px; text-align: center; }
+      .foot strong { color: #737d91; }
+      @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      @media (max-width: 420px) {
+        .page { width: min(100% - 22px, 520px); padding-top: 17px; }
+        .topbar { margin-bottom: 18px; }
+        .hero { padding: 20px 18px 21px; border-radius: 19px; }
+        .card { padding: 18px; border-radius: 19px; }
+        .spark { right: 17px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Elicate Pay STK tester">
+          <span class="brand-mark" aria-hidden="true">E</span>
+          <span>Elicate <span class="brand-pay">Pay</span></span>
+        </a>
+        <span class="top-label">STK test</span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <span class="spark" aria-hidden="true">+</span>
+        <p class="eyebrow">Mobile money · Zambia</p>
+        <h1 id="page-title">Send a test prompt.</h1>
+        <p class="hero-copy">Enter a phone and amount. We’ll request an STK push and show the status returned by your payment server.</p>
+      </section>
+
+      <section class="card" aria-labelledby="form-title">
+        <div class="card-heading">
+          <h2 id="form-title">Payment details</h2>
+          <span class="currency">ZMW · Zambian Kwacha</span>
+        </div>
+
+        <form id="payment-form">
+          <label class="field" for="amount">
+            <span class="field-label">Amount</span>
+            <span class="input-wrap">
+              <span class="input-prefix">K</span>
+              <input id="amount" name="amount" type="number" min="1" step="0.01" placeholder="50.00" inputmode="decimal" required />
+            </span>
+          </label>
+
+          <label class="field" for="phone">
+            <span class="field-label">Mobile number</span>
+            <span class="input-wrap">
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="097 123 4567" maxlength="24" required />
+            </span>
+            <span class="helper">Use the number that should receive the payment prompt.</span>
+          </label>
+
+          <div class="field">
+            <span class="field-label">Network · automatic</span>
+            <div class="network-detected" aria-live="polite">
+              <span id="network-name" class="network-name">Enter your number</span>
+              <span id="network-badge" class="network-badge">Auto</span>
+            </div>
+            <span id="network-hint" class="helper">Detected from Zambia’s mobile-number prefix.</span>
+            <input id="network" name="network" type="hidden" value="" />
+          </div>
+
+          <button id="submit-button" class="submit" type="submit">
+            <span id="button-label">Send STK prompt</span>
+            <span class="button-arrow" aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <div class="note">
+          <span class="note-mark" aria-hidden="true">i</span>
+          <span>Test or live mode is controlled by the key on your Render server. This page never contains your secret key.</span>
+        </div>
+
+        <section id="result" class="result" aria-live="polite" hidden>
+          <div class="result-top">
+            <div>
+              <h3 id="result-title" class="result-title">Waiting for payment</h3>
+              <p id="result-message" class="result-message">Approve the prompt on your phone.</p>
+            </div>
+            <span id="status" class="status">Pending</span>
+          </div>
+          <dl class="receipt">
+            <div><dt>Transaction</dt><dd id="transaction-value">—</dd></div>
+            <div><dt>Reference</dt><dd id="reference-value">—</dd></div>
+            <div><dt>Amount</dt><dd id="amount-value">—</dd></div>
+            <div><dt>Receipt</dt><dd id="receipt-value">—</dd></div>
+          </dl>
+          <a id="redirect-link" class="receipt-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Continue securely →</a>
+        </section>
+        <p id="error" class="error" role="alert" hidden></p>
+        <p class="foot">Requests go to <strong>elicatepayserver.onrender.com</strong></p>
+      </section>
+    </main>
+
+    <script>
+      "use strict";
+      const API_BASE = "https://elicatepayserver.onrender.com";
+      const form = document.getElementById("payment-form");
+      const submitButton = document.getElementById("submit-button");
+      const buttonLabel = document.getElementById("button-label");
+      const resultPanel = document.getElementById("result");
+      const statusBadge = document.getElementById("status");
+      const resultTitle = document.getElementById("result-title");
+      const resultMessage = document.getElementById("result-message");
+      const errorBox = document.getElementById("error");
+      const redirectLink = document.getElementById("redirect-link");
+      const phoneInput = document.getElementById("phone");
+      const networkInput = document.getElementById("network");
+      const networkName = document.getElementById("network-name");
+      const networkBadge = document.getElementById("network-badge");
+      const networkHint = document.getElementById("network-hint");
+      let activeTransactionId = null;
+
+      const zambiaMobileNetworks = {
+        "55": "ZAMTEL", "56": "MTN", "57": "AIRTEL",
+        "75": "ZAMTEL", "76": "MTN", "77": "AIRTEL",
+        "95": "ZAMTEL", "96": "MTN", "97": "AIRTEL",
+      };
+      const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const normalStatus = (value) => {
+        const status = String(value || "pending").toLowerCase();
+        return status === "redirect" ? "pending" : status;
+      };
+      const isTerminal = (status) => ["success", "test success", "failed"].includes(status);
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.hidden = false;
+      }
+
+      function nationalNumber(value) {
+        let digits = value.replace(/\D/g, "");
+        if (digits.startsWith("260")) digits = digits.slice(3);
+        if (digits.startsWith("0")) digits = digits.slice(1);
+        return digits;
+      }
+
+      function updateNetwork(value) {
+        const number = nationalNumber(value);
+        const network = zambiaMobileNetworks[number.slice(0, 2)] || "";
+        networkInput.value = network;
+        networkName.textContent = network === "AIRTEL"
+          ? "Airtel detected"
+          : network === "ZAMTEL"
+            ? "Zamtel detected"
+            : network === "MTN"
+              ? "MTN detected"
+              : number.length >= 2
+                ? "Network not recognized"
+                : "Enter your number";
+        networkBadge.textContent = network ? "Detected" : number.length >= 2 ? "Check prefix" : "Auto";
+        networkBadge.dataset.network = network || (number.length >= 2 ? "unknown" : "");
+        networkHint.textContent = network
+          ? `Detected from the ${number.slice(0, 2)} prefix.`
+          : number.length >= 2
+            ? "This prefix is not in the MTN, Airtel, or Zamtel collection ranges."
+            : "Detected from Zambia’s mobile-number prefix.";
+      }
+
+      phoneInput.addEventListener("input", () => updateNetwork(phoneInput.value));
+      updateNetwork(phoneInput.value);
+
+      function displayResult(data, fallback = {}) {
+        const receipt = data.receipt || {};
+        const status = normalStatus(data.status || receipt.status);
+        const transactionId = data.transaction_id || receipt.transaction_id || fallback.transactionId || "—";
+        const reference = data.reference || receipt.reference || fallback.reference || "—";
+        const amount = data.amount ?? receipt.amount ?? fallback.amount;
+        const currency = data.currency || receipt.currency || fallback.currency || "ZMW";
+
+        resultPanel.hidden = false;
+        statusBadge.textContent = status;
+        statusBadge.className = "status" + (status === "test success" ? " test-success" : ` ${status}`);
+        document.getElementById("transaction-value").textContent = transactionId;
+        document.getElementById("reference-value").textContent = reference;
+        document.getElementById("amount-value").textContent = amount == null ? "—" : `${currency} ${Number(amount).toFixed(2)}`;
+        document.getElementById("receipt-value").textContent = receipt.receipt_id || "—";
+
+        if (status === "success") {
+          resultTitle.textContent = "Payment confirmed";
+          resultMessage.textContent = "The backend confirmed this collection.";
+        } else if (status === "test success") {
+          resultTitle.textContent = "Test payment confirmed";
+          resultMessage.textContent = "This was a sandbox result; no live payment was made.";
+        } else if (status === "failed") {
+          resultTitle.textContent = "Payment failed";
+          resultMessage.textContent = data.message || data.error || "The provider reported that this payment failed.";
+        } else {
+          resultTitle.textContent = "Waiting for payment";
+          resultMessage.textContent = "Approve the prompt on your phone while we check the status.";
+        }
+
+        const redirectUrl = data.meta?.authorization?.redirect_url;
+        if (redirectUrl) {
+          redirectLink.href = redirectUrl;
+          redirectLink.hidden = false;
+        } else {
+          redirectLink.hidden = true;
+          redirectLink.removeAttribute("href");
+        }
+      }
+
+      async function readJson(response) {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status}).`);
+        return data;
+      }
+
+      async function pollStatus(transactionId, fallback) {
+        const startedAt = Date.now();
+        while (activeTransactionId === transactionId && Date.now() - startedAt < 120000) {
+          await pause(3000);
+          if (activeTransactionId !== transactionId) return;
+          try {
+            const response = await fetch(`${API_BASE}/api/checkout/status/${encodeURIComponent(transactionId)}`);
+            const data = await readJson(response);
+            displayResult(data, fallback);
+            if (isTerminal(normalStatus(data.status || data.receipt?.status))) {
+              activeTransactionId = null;
+              submitButton.disabled = false;
+              buttonLabel.textContent = "Send another test";
+              return;
+            }
+          } catch {
+            resultMessage.textContent = "Status check paused briefly. Still waiting for the phone response…";
+          }
+        }
+        if (activeTransactionId === transactionId) {
+          activeTransactionId = null;
+          submitButton.disabled = false;
+          buttonLabel.textContent = "Check again with a new test";
+          resultMessage.textContent = "No final status yet. Check the phone or your Elicate Pay dashboard before sending another request.";
+        }
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorBox.hidden = true;
+        resultPanel.hidden = true;
+        activeTransactionId = null;
+
+        const amount = Number(document.getElementById("amount").value);
+        const phone = phoneInput.value.trim();
+        const national = nationalNumber(phone);
+        const network = networkInput.value;
+        if (!Number.isFinite(amount) || amount <= 0) {
+          showError("Enter an amount greater than zero.");
+          return;
+        }
+        if (!/^\+?[0-9 ()-]{6,24}$/.test(phone)) {
+          showError("Enter a valid mobile number.");
+          return;
+        }
+        if (national.length !== 9) {
+          showError("Enter a Zambian mobile number with 9 digits after the country code.");
+          return;
+        }
+        if (!network) {
+          showError("The network could not be detected from this number’s prefix.");
+          return;
+        }
+
+        submitButton.disabled = true;
+        buttonLabel.textContent = "Sending request…";
+        const request = { amount, phone: `0${national}`, network, currency: "ZMW", customer_name: "STK Tester" };
+        try {
+          const response = await fetch(`${API_BASE}/api/checkout/pay`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(request),
+          });
+          const data = await readJson(response);
+          displayResult(data, { amount, currency: "ZMW" });
+          const status = normalStatus(data.status || data.receipt?.status);
+          const transactionId = data.transaction_id || data.receipt?.transaction_id;
+          if (transactionId && !isTerminal(status)) {
+            activeTransactionId = transactionId;
+            buttonLabel.textContent = "Waiting for confirmation…";
+            pollStatus(transactionId, { amount, currency: "ZMW", reference: data.reference });
+          } else {
+            submitButton.disabled = false;
+            buttonLabel.textContent = status === "failed" ? "Try again" : "Send another test";
+          }
+        } catch (error) {
+          submitButton.disabled = false;
+          buttonLabel.textContent = "Try again";
+          const message = error instanceof TypeError
+            ? "Could not reach the backend. Check that Render is running and that this page’s origin is in ALLOWED_ORIGINS."
+            : error.message || "The payment request could not be completed.";
+          showError(message);
+        }
+      });
+    </script>
+  </body>
+</html>
